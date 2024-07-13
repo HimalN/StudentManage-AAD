@@ -1,9 +1,6 @@
 package org.example.demo2.controller;
 
-import jakarta.json.Json;
-import jakarta.json.JsonArray;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonReader;
+import jakarta.json.*;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import jakarta.servlet.ServletException;
@@ -66,33 +63,26 @@ public class studentController extends HttpServlet {
             resp.sendError(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
         }
 
-
-        Jsonb jsonb = JsonbBuilder.create();
-        /*this binds the values to the object*/
+        try(var writer = resp.getWriter()) {
+            Jsonb jsonb = JsonbBuilder.create();
+            studentDto studentDTO = jsonb.fromJson(req.getReader(), studentDto.class);
+            studentDTO.setId(utilProcess.generateId());
+            var saveData = new StudentDataProcess();
+            writer.write(saveData.saveStudent(studentDTO, connection));
+        } catch (JsonException e) {
+            throw new RuntimeException(e);
+        }
+        /*Jsonb jsonb = JsonbBuilder.create();
+        *//*this binds the values to the object*//*
         studentDto studentDTO = jsonb.fromJson(req.getReader(), studentDto.class);
         studentDTO.setId(utilProcess.generateId());
-        System.out.println(studentDTO);
+        System.out.println(studentDTO);*/
 
         /*Jsonb jsonb = JsonbBuilder.create();
         List<studentDto> studentDTO = jsonb.fromJson(req.getReader(), new ArrayList<studentDto>() {}.getClass().getGenericSuperclass()); *//*this binds the values to the object*//*
         System.out.println(studentDTO);*/
 
-        try {
-            var ps = connection.prepareStatement(SAVE_STUDENT);
-            ps.setString(1, studentDTO.getId());
-            ps.setString(2, studentDTO.getName());
-            ps.setString(3, studentDTO.getEmail());
-            ps.setString(4, studentDTO.getCity());
-            ps.setString(5, studentDTO.getLevel());
-            if(ps.executeUpdate() != 0 ){
-                resp.getWriter().write("Student Saved");
-                resp.sendError(HttpServletResponse.SC_CREATED);
-            } else {
-                resp.getWriter().write("Student Not Saved");
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+
 
 
         /*------------------------------------------------------------*/

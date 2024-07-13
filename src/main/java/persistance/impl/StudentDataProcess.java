@@ -33,17 +33,33 @@ public class StudentDataProcess implements StudentData {
     }
 
     @Override
-    public studentDto saveStudent(studentDto studentDto, Connection connection) {
-        return null;
+    public String saveStudent(studentDto studentDto, Connection connection) {
+        try {
+            var ps = connection.prepareStatement(SAVE_STUDENT);
+            ps.setString(1, studentDto.getId());
+            ps.setString(2, studentDto.getName());
+            ps.setString(3, studentDto.getEmail());
+            ps.setString(4, studentDto.getCity());
+            ps.setString(5, studentDto.getLevel());
+            if(ps.executeUpdate() != 0 ){
+                return "Student Saved";
+            } else {
+                return "Student not saved";
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
-    public studentDto deleteStudent(String stundetId, Connection connection) {
-        return null;
+    public boolean deleteStudent(String stundetId, Connection connection) {
+        return false;
     }
 
     @Override
-    public studentDto updateStudent(String sudentId, studentDto student, Connection connection) {
-        return null;
+    public boolean updateStudent(String sudentId, studentDto student, Connection connection) {
+        return false;
     }
+
+
 }
